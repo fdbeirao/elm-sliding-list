@@ -18,6 +18,7 @@ module SlidingList
         , filter
         , take
         , drop
+        , append
         )
 
 {-| A data type that holds an upper bounded sliding list.
@@ -53,6 +54,11 @@ the maximum size:
 # Sub-lists
 
 @docs head, tail, filter, take, drop
+
+
+# Putting lists together
+
+@docs append
 
 
 # Opaque data types
@@ -213,3 +219,12 @@ the same maximum items as the previous one.
 drop : Int -> SlidingList a -> SlidingList a
 drop howMany (SlidingList list size) =
     SlidingList (list |> List.drop howMany) size
+
+
+{-| Append a list of elements to this sliding list.
+Each element will be treated as if it had been cons'd by their
+order in the incoming list.
+-}
+append : List a -> SlidingList a -> SlidingList a
+append newItems list =
+    newItems |> List.foldl cons list

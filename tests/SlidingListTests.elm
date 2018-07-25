@@ -76,7 +76,7 @@ fromListTests =
                     |> SlidingList.fromList (adHocPositiveInt 5)
                     |> SlidingList.items
                     |> Expect.equal [ "A", "B" ]
-        , test "fromList sets the maximumSize of the SlidingList" <|
+        , test "fromList sets the maximum size of the sliding list" <|
             \_ ->
                 [ "A", "B" ]
                     |> SlidingList.fromList (adHocPositiveInt 5)
@@ -94,7 +94,7 @@ fromListTests =
 consTests : Test
 consTests =
     describe "cons (::) tests"
-        [ test "Adding 2 items to a size 1 sliding list should only keep the last one" <|
+        [ test "Adding 2 items to a maximum size 1 sliding list should only keep the last one" <|
             \_ ->
                 testSlidingListWithSize 1
                     |> SlidingList.cons 1
@@ -107,18 +107,18 @@ consTests =
 lengthTests : Test
 lengthTests =
     describe "length tests"
-        [ test "The length of an empty list is 0" <|
+        [ test "The length of an empty sliding list is 0" <|
             \_ ->
                 testSlidingListWithSize 1
                     |> SlidingList.length
                     |> Expect.equal 0
-        , test "The length of a list with size 5, but only 1 element is 1" <|
+        , test "The length of a sliding list with maximum size 5, but only 1 element is 1" <|
             \_ ->
                 testSlidingListWithSize 5
                     |> SlidingList.cons "item"
                     |> SlidingList.length
                     |> Expect.equal 1
-        , test "The length of a list with size 1, after trying to cons 2 element is 1" <|
+        , test "The length of a sliding list with maximum size 1, after trying to cons 2 elements is 1" <|
             \_ ->
                 testSlidingListWithSize 1
                     |> SlidingList.cons "1"
@@ -131,7 +131,7 @@ lengthTests =
 reverseTests : Test
 reverseTests =
     describe "reverse tests"
-        [ test "Reversing a symetric list is the same list" <|
+        [ test "Reversing a symetric list results in the same list" <|
             \_ ->
                 let
                     initialList =
@@ -146,7 +146,7 @@ reverseTests =
                 in
                     reversedList
                         |> Expect.equal initialList
-        , test "Reversing a list reverses it" <|
+        , test "Reversing a sliding list reverses its items" <|
             \_ ->
                 testSlidingListWithSize 2
                     |> SlidingList.cons "A"
@@ -154,7 +154,7 @@ reverseTests =
                     |> SlidingList.reverse
                     |> SlidingList.items
                     |> Expect.equal [ "A", "B" ]
-        , test "Reversing a list keeps its maximum size" <|
+        , test "Reversing a sliding list keeps its maximum size" <|
             \_ ->
                 testSlidingListWithSize 3
                     |> SlidingList.cons "A"
@@ -169,7 +169,7 @@ reverseTests =
 maximumSizeTests : Test
 maximumSizeTests =
     describe "maximumSize tests"
-        [ test "It is possible to obtain the maximum size of a SlidingList" <|
+        [ test "It is possible to obtain the maximum size of a sliding list" <|
             \_ ->
                 testSlidingListWithSize 3
                     |> SlidingList.maximumSize
@@ -180,13 +180,13 @@ maximumSizeTests =
 resizeTests : Test
 resizeTests =
     describe "resize tests"
-        [ test "Resizing a SlidingList changes its maximumSize" <|
+        [ test "Resizing a sliding list changes its maximum size" <|
             \_ ->
                 testSlidingListWithSize 3
                     |> SlidingList.resize (adHocPositiveInt 1)
                     |> SlidingList.maximumSize
                     |> Expect.equal 1
-        , test "Shortening a SlidingList truncates it" <|
+        , test "Shortening a sliding list truncates it" <|
             \_ ->
                 testSlidingListWithSize 2
                     |> SlidingList.cons "A"
@@ -200,13 +200,13 @@ resizeTests =
 memberTests : Test
 memberTests =
     describe "member tests"
-        [ test "An existing item should be a member of the SlidingList" <|
+        [ test "An existing item should be a member of the sliding list" <|
             \_ ->
                 testSlidingListWithSize 2
                     |> SlidingList.cons "A"
                     |> SlidingList.member "A"
                     |> Expect.equal True
-        , test "A non-existing item should not be a member of the SlidingList" <|
+        , test "A non-existing item should not be a member of the sliding list" <|
             \_ ->
                 testSlidingListWithSize 2
                     |> SlidingList.cons "A"
@@ -225,7 +225,7 @@ memberTests =
 headTests : Test
 headTests =
     describe "head tests"
-        [ test "The head of an empty SlidingList is Nothing" <|
+        [ test "The head of an empty sliding list is Nothing" <|
             \_ ->
                 testSlidingListWithSize 1
                     |> SlidingList.head
@@ -243,18 +243,18 @@ headTests =
 tailTests : Test
 tailTests =
     describe "tail tests"
-        [ test "The tail of an empty SlidingList is Nothing" <|
+        [ test "The tail of an empty sliding list is Nothing" <|
             \_ ->
                 testSlidingListWithSize 1
                     |> SlidingList.tail
                     |> Expect.equal Nothing
-        , test "The tail of a SlidingList with one single element is an empty list" <|
+        , test "The tail of a sliding list with one single element is an empty list" <|
             \_ ->
                 testSlidingListWithSize 1
                     |> SlidingList.cons "A"
                     |> SlidingList.tail
                     |> Expect.equal (Just [])
-        , test "The tail of a SlidingList with multiple elements is the expected tail" <|
+        , test "The tail of a sliding list with multiple elements is the expected tail" <|
             \_ ->
                 testSlidingListWithSize 3
                     |> SlidingList.cons "A"
@@ -278,7 +278,7 @@ filterTests =
                     |> SlidingList.filter (\i -> i % 2 == 0)
                     |> SlidingList.items
                     |> Expect.equal [ 4, 2 ]
-        , test "Filter keeps the maximumSize of the list" <|
+        , test "Filter keeps the maximum size of the list" <|
             \_ ->
                 testSlidingListWithSize 4
                     |> SlidingList.cons 1
@@ -302,7 +302,7 @@ takeTests =
                     |> SlidingList.take 1
                     |> SlidingList.items
                     |> Expect.equal [ "B" ]
-        , test "Take keeps the maximumSize of the list" <|
+        , test "Take keeps the maximum size of the list" <|
             \_ ->
                 testSlidingListWithSize 3
                     |> SlidingList.cons "A"
@@ -330,7 +330,7 @@ dropTests =
                     |> SlidingList.drop 1
                     |> SlidingList.items
                     |> Expect.equal [ "A" ]
-        , test "Drop keeps the maximumSize of the list" <|
+        , test "Drop keeps the maximum size of the list" <|
             \_ ->
                 testSlidingListWithSize 3
                     |> SlidingList.cons "A"
@@ -344,4 +344,38 @@ dropTests =
                     |> SlidingList.drop 1
                     |> SlidingList.isEmpty
                     |> Expect.equal True
+        ]
+
+
+appendTests : Test
+appendTests =
+    describe "append tests"
+        [ test "Append treats each element of the new list as if they had been cons'd" <|
+            \_ ->
+                testSlidingListWithSize 3
+                    |> SlidingList.cons "A"
+                    |> SlidingList.append [ "B", "C", "D" ]
+                    |> SlidingList.items
+                    |> Expect.equal [ "D", "C", "B" ]
+        , test "Append keeps the maximum size of the list" <|
+            \_ ->
+                testSlidingListWithSize 3
+                    |> SlidingList.cons "A"
+                    |> SlidingList.append [ "B", "C", "D" ]
+                    |> SlidingList.maximumSize
+                    |> Expect.equal 3
+        , test "Append of an empty list keeps the original list" <|
+            \_ ->
+                [ "A", "B" ]
+                    |> SlidingList.fromList (adHocPositiveInt 3)
+                    |> SlidingList.append []
+                    |> SlidingList.items
+                    |> Expect.equal [ "A", "B" ]
+        ,test "Append with enough space does not slide elements out" <|
+            \_ ->
+                testSlidingListWithSize 3
+                    |> SlidingList.cons "A"
+                    |> SlidingList.append [ "B" ]
+                    |> SlidingList.items
+                    |> Expect.equal [ "B", "A" ]
         ]
