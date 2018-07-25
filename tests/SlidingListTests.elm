@@ -195,3 +195,21 @@ memberTests =
                     |> SlidingList.member "A"
                     |> Expect.equal False
         ]
+
+
+headTests : Test
+headTests =
+    describe "head tests"
+        [ test "The head of an empty SlidingList is Nothing" <|
+            \_ ->
+                testSlidingListWithSize 1
+                    |> SlidingList.head
+                    |> Expect.equal Nothing
+        , test "The head of a non empty list should be the last added item" <|
+            \_ ->
+                testSlidingListWithSize 2
+                    |> SlidingList.cons "A"
+                    |> SlidingList.cons "B"
+                    |> SlidingList.head
+                    |> Expect.equal (Just "B")
+        ]

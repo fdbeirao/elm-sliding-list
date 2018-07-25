@@ -11,6 +11,7 @@ module SlidingList
         , maximumSize
         , resize
         , member
+        , head
         )
 
 
@@ -73,3 +74,8 @@ resize (PositiveInt size) (SlidingList list _) =
 member : a -> SlidingList a -> Bool
 member item (SlidingList list _) =
     list |> List.member item
+
+
+head : SlidingList a -> Maybe a
+head (SlidingList list _) =
+    list |> List.head
