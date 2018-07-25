@@ -12,6 +12,7 @@ module SlidingList
         , resize
         , member
         , head
+        , tail
         )
 
 
@@ -79,3 +80,8 @@ member item (SlidingList list _) =
 head : SlidingList a -> Maybe a
 head (SlidingList list _) =
     list |> List.head
+
+
+tail : SlidingList a -> Maybe (List a)
+tail (SlidingList list _) =
+    list |> List.tail

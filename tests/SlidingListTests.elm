@@ -213,3 +213,28 @@ headTests =
                     |> SlidingList.head
                     |> Expect.equal (Just "B")
         ]
+
+
+tailTests : Test
+tailTests =
+    describe "tail tests"
+        [ test "The tail of an empty SlidingList is Nothing" <|
+            \_ ->
+                testSlidingListWithSize 1
+                    |> SlidingList.tail
+                    |> Expect.equal Nothing
+        , test "The tail of a SlidingList with one single element is an empty list" <|
+            \_ ->
+                testSlidingListWithSize 1
+                    |> SlidingList.cons "A"
+                    |> SlidingList.tail
+                    |> Expect.equal (Just [])
+        , test "The tail of a SlidingList with multiple elements is the expected tail" <|
+            \_ ->
+                testSlidingListWithSize 3
+                    |> SlidingList.cons "A"
+                    |> SlidingList.cons "B"
+                    |> SlidingList.cons "C"
+                    |> SlidingList.tail
+                    |> Expect.equal (Just [ "B", "A" ])
+        ]
