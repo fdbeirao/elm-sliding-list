@@ -17,6 +17,7 @@ module SlidingList
         , tail
         , filter
         , take
+        , drop
         )
 
 
@@ -110,3 +111,8 @@ filter f (SlidingList list size) =
 take : Int -> SlidingList a -> SlidingList a
 take howMany (SlidingList list size) =
     SlidingList (list |> List.take howMany) size
+
+
+drop : Int -> SlidingList a -> SlidingList a
+drop howMany (SlidingList list size) =
+    SlidingList (list |> List.drop howMany) size

@@ -317,3 +317,31 @@ takeTests =
                     |> SlidingList.isEmpty
                     |> Expect.equal True
         ]
+
+
+dropTests : Test
+dropTests =
+    describe "drop tests"
+        [ test "Drop works as expected" <|
+            \_ ->
+                testSlidingListWithSize 3
+                    |> SlidingList.cons "A"
+                    |> SlidingList.cons "B"
+                    |> SlidingList.drop 1
+                    |> SlidingList.items
+                    |> Expect.equal [ "A" ]
+        , test "Drop keeps the maximumSize of the list" <|
+            \_ ->
+                testSlidingListWithSize 3
+                    |> SlidingList.cons "A"
+                    |> SlidingList.cons "B"
+                    |> SlidingList.drop 1
+                    |> SlidingList.maximumSize
+                    |> Expect.equal 3
+        , test "Drop from an empty list is still an empty list" <|
+            \_ ->
+                testSlidingListWithSize 3
+                    |> SlidingList.drop 1
+                    |> SlidingList.isEmpty
+                    |> Expect.equal True
+        ]
