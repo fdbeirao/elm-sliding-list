@@ -238,3 +238,29 @@ tailTests =
                     |> SlidingList.tail
                     |> Expect.equal (Just [ "B", "A" ])
         ]
+
+
+filterTests : Test
+filterTests =
+    describe "filter tests"
+        [ test "Filter works as expected" <|
+            \_ ->
+                testSlidingListWithSize 4
+                    |> SlidingList.cons 1
+                    |> SlidingList.cons 2
+                    |> SlidingList.cons 3
+                    |> SlidingList.cons 4
+                    |> SlidingList.filter (\i -> i % 2 == 0)
+                    |> SlidingList.items
+                    |> Expect.equal [ 4, 2 ]
+        , test "Filter keeps the maximumSize of the list" <|
+            \_ ->
+                testSlidingListWithSize 4
+                    |> SlidingList.cons 1
+                    |> SlidingList.cons 2
+                    |> SlidingList.cons 3
+                    |> SlidingList.cons 4
+                    |> SlidingList.filter (\i -> i % 2 == 0)
+                    |> SlidingList.maximumSize
+                    |> Expect.equal 4
+        ]

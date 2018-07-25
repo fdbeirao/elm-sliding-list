@@ -13,6 +13,7 @@ module SlidingList
         , member
         , head
         , tail
+        , filter
         )
 
 
@@ -85,3 +86,8 @@ head (SlidingList list _) =
 tail : SlidingList a -> Maybe (List a)
 tail (SlidingList list _) =
     list |> List.tail
+
+
+filter : (a -> Bool) -> SlidingList a -> SlidingList a
+filter f (SlidingList list size) =
+    SlidingList (list |> List.filter f) size
