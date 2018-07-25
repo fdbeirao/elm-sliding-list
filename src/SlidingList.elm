@@ -10,6 +10,7 @@ module SlidingList
         , items
         , length
         , reverse
+        , availableSpace
         , maximumSize
         , resize
         , member
@@ -44,7 +45,7 @@ the maximum size:
 
 # Creating a sliding list
 
-@docs positiveInt, newSlidingList, fromList, resize, maximumSize
+@docs positiveInt, newSlidingList, fromList, resize, availableSpace, maximumSize
 
 
 # Basics
@@ -161,6 +162,14 @@ sliding list with the same maximum size.
 reverse : SlidingList a -> SlidingList a
 reverse (SlidingList list size) =
     SlidingList (list |> List.reverse) size
+
+
+{-| Obtain how much available space there is left, before
+this list starts to slide.
+-}
+availableSpace : SlidingList a -> Int
+availableSpace (SlidingList list size) =
+    size - (list |> List.length)
 
 
 {-| Obtain the current maximum size allowed for this

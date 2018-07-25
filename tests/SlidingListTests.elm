@@ -166,6 +166,29 @@ reverseTests =
         ]
 
 
+availableSpaceTests : Test
+availableSpaceTests =
+    describe "availableSpace tests"
+        [ test "The available space of an empty sliding list is its maximum size" <|
+            \_ ->
+                testSlidingListWithSize 3
+                    |> SlidingList.availableSpace
+                    |> Expect.equal 3
+        , test "The available space of a list with maximum size 3 and one element is 2" <|
+            \_ ->
+                testSlidingListWithSize 3
+                    |> SlidingList.cons "A"
+                    |> SlidingList.availableSpace
+                    |> Expect.equal 2
+        , test "The available space of a full list is zero" <|
+            \_ ->
+                testSlidingListWithSize 1
+                    |> SlidingList.cons "A"
+                    |> SlidingList.availableSpace
+                    |> Expect.equal 0
+        ]
+
+
 maximumSizeTests : Test
 maximumSizeTests =
     describe "maximumSize tests"
