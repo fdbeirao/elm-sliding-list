@@ -16,6 +16,7 @@ module SlidingList
         , head
         , tail
         , filter
+        , take
         )
 
 
@@ -104,3 +105,8 @@ tail (SlidingList list _) =
 filter : (a -> Bool) -> SlidingList a -> SlidingList a
 filter f (SlidingList list size) =
     SlidingList (list |> List.filter f) size
+
+
+take : Int -> SlidingList a -> SlidingList a
+take howMany (SlidingList list size) =
+    SlidingList (list |> List.take howMany) size

@@ -289,3 +289,31 @@ filterTests =
                     |> SlidingList.maximumSize
                     |> Expect.equal 4
         ]
+
+
+takeTests : Test
+takeTests =
+    describe "take tests"
+        [ test "Take works as expected" <|
+            \_ ->
+                testSlidingListWithSize 3
+                    |> SlidingList.cons "A"
+                    |> SlidingList.cons "B"
+                    |> SlidingList.take 1
+                    |> SlidingList.items
+                    |> Expect.equal [ "B" ]
+        , test "Take keeps the maximumSize of the list" <|
+            \_ ->
+                testSlidingListWithSize 3
+                    |> SlidingList.cons "A"
+                    |> SlidingList.cons "B"
+                    |> SlidingList.take 1
+                    |> SlidingList.maximumSize
+                    |> Expect.equal 3
+        , test "Take from an empty list is still an empty list" <|
+            \_ ->
+                testSlidingListWithSize 3
+                    |> SlidingList.take 1
+                    |> SlidingList.isEmpty
+                    |> Expect.equal True
+        ]
