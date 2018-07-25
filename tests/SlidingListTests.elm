@@ -23,6 +23,33 @@ positiveIntTests =
         ]
 
 
+{-| This function is meant to make testing easier.
+
+It leverages Debug.crash to override the compiler guarantees, while bypassing the returned Maybe
+
+-}
+testSlidingListWithSize : Int -> SlidingList.SlidingList a
+testSlidingListWithSize size =
+    size
+        |> adHocPositiveInt
+        |> SlidingList.newSlidingList
+
+
+{-| This function is meant to make testing easier.
+
+It leverages Debug.crash to override the compiler guarantees, while bypassing the returned Maybe
+
+-}
+adHocPositiveInt : Int -> SlidingList.PositiveInt
+adHocPositiveInt size =
+    case SlidingList.positiveInt size of
+        Just a ->
+            a
+
+        Nothing ->
+            Debug.crash "An error occurred creating a positiveInt"
+
+
 isEmptyTests : Test
 isEmptyTests =
     describe "isEmpty tests"
@@ -40,19 +67,28 @@ isEmptyTests =
         ]
 
 
-{-| This function is meant to make testing easier.
-
-It leverages Debug.crash to override the compiler guarantees, while bypassing the returned Maybe
-
--}
-testSlidingListWithSize : Int -> SlidingList.SlidingList a
-testSlidingListWithSize size =
-    case SlidingList.positiveInt size of
-        Just a ->
-            a |> SlidingList.newSlidingList
-
-        Nothing ->
-            Debug.crash "An error occurred creating a positiveInt"
+fromListTests : Test
+fromListTests =
+    describe "fromList tests"
+        [ test "fromList adds items from a list" <|
+            \_ ->
+                [ "A", "B" ]
+                    |> SlidingList.fromList (adHocPositiveInt 5)
+                    |> SlidingList.items
+                    |> Expect.equal [ "A", "B" ]
+        , test "fromList sets the maximumSize of the SlidingList" <|
+            \_ ->
+                [ "A", "B" ]
+                    |> SlidingList.fromList (adHocPositiveInt 5)
+                    |> SlidingList.maximumSize
+                    |> Expect.equal 5
+        , test "fromList slides if the input is greater than its maximum size" <|
+            \_ ->
+                [ "A", "B", "C" ]
+                    |> SlidingList.fromList (adHocPositiveInt 2)
+                    |> SlidingList.items
+                    |> Expect.equal [ "B", "C" ]
+        ]
 
 
 consTests : Test
@@ -143,33 +179,22 @@ maximumSizeTests =
 
 resizeTests : Test
 resizeTests =
-    let
-        adHocPositiveInt =
-            (\size ->
-                case SlidingList.positiveInt size of
-                    Just a ->
-                        a
-
-                    Nothing ->
-                        Debug.crash "An error occurred creating a positiveInt"
-            )
-    in
-        describe "resize tests"
-            [ test "Resizing a SlidingList changes its maximumSize" <|
-                \_ ->
-                    testSlidingListWithSize 3
-                        |> SlidingList.resize (adHocPositiveInt 1)
-                        |> SlidingList.maximumSize
-                        |> Expect.equal 1
-            , test "Shortening a SlidingList truncates it" <|
-                \_ ->
-                    testSlidingListWithSize 2
-                        |> SlidingList.cons "A"
-                        |> SlidingList.cons "B"
-                        |> SlidingList.resize (adHocPositiveInt 1)
-                        |> SlidingList.items
-                        |> Expect.equal [ "B" ]
-            ]
+    describe "resize tests"
+        [ test "Resizing a SlidingList changes its maximumSize" <|
+            \_ ->
+                testSlidingListWithSize 3
+                    |> SlidingList.resize (adHocPositiveInt 1)
+                    |> SlidingList.maximumSize
+                    |> Expect.equal 1
+        , test "Shortening a SlidingList truncates it" <|
+            \_ ->
+                testSlidingListWithSize 2
+                    |> SlidingList.cons "A"
+                    |> SlidingList.cons "B"
+                    |> SlidingList.resize (adHocPositiveInt 1)
+                    |> SlidingList.items
+                    |> Expect.equal [ "B" ]
+        ]
 
 
 memberTests : Test

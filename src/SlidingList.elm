@@ -1,8 +1,10 @@
 module SlidingList
     exposing
         ( SlidingList
+        , PositiveInt
         , positiveInt
         , newSlidingList
+        , fromList
         , isEmpty
         , cons
         , items
@@ -34,8 +36,19 @@ positiveInt i =
 
 
 newSlidingList : PositiveInt -> SlidingList a
-newSlidingList (PositiveInt size) =
-    SlidingList [] size
+newSlidingList size =
+    fromList size []
+
+
+fromList : PositiveInt -> List a -> SlidingList a
+fromList (PositiveInt size) list =
+    SlidingList
+        (list
+            |> List.reverse
+            |> List.take size
+            |> List.reverse
+        )
+        size
 
 
 isEmpty : SlidingList a -> Bool
