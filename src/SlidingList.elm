@@ -19,6 +19,7 @@ module SlidingList
         , take
         , drop
         , append
+        , map
         )
 
 {-| A data type that holds an upper bounded sliding list.
@@ -59,6 +60,11 @@ the maximum size:
 # Putting lists together
 
 @docs append
+
+
+# Mapping
+
+@docs map
 
 
 # Opaque data types
@@ -200,8 +206,8 @@ that satisfy the predicate. The new sliding list will have the
 same maximum items as the previous one.
 -}
 filter : (a -> Bool) -> SlidingList a -> SlidingList a
-filter f (SlidingList list size) =
-    SlidingList (list |> List.filter f) size
+filter fn (SlidingList list size) =
+    SlidingList (list |> List.filter fn) size
 
 
 {-| Take the first *n* items of this list into a new sliding list.
@@ -228,3 +234,12 @@ order in the incoming list.
 append : List a -> SlidingList a -> SlidingList a
 append newItems list =
     newItems |> List.foldl cons list
+
+
+{-| Apply a function to every element of this sliding list.
+-}
+map : (a -> b) -> SlidingList a -> SlidingList b
+map fn (SlidingList items size) =
+    fromList
+        (PositiveInt size)
+        (items |> List.map fn)

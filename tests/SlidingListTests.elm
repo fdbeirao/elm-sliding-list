@@ -278,7 +278,7 @@ filterTests =
                     |> SlidingList.filter (\i -> i % 2 == 0)
                     |> SlidingList.items
                     |> Expect.equal [ 4, 2 ]
-        , test "Filter keeps the maximum size of the list" <|
+        , test "Filter keeps the maximum size of the sliding list" <|
             \_ ->
                 testSlidingListWithSize 4
                     |> SlidingList.cons 1
@@ -302,7 +302,7 @@ takeTests =
                     |> SlidingList.take 1
                     |> SlidingList.items
                     |> Expect.equal [ "B" ]
-        , test "Take keeps the maximum size of the list" <|
+        , test "Take keeps the maximum size of the sliding list" <|
             \_ ->
                 testSlidingListWithSize 3
                     |> SlidingList.cons "A"
@@ -330,7 +330,7 @@ dropTests =
                     |> SlidingList.drop 1
                     |> SlidingList.items
                     |> Expect.equal [ "A" ]
-        , test "Drop keeps the maximum size of the list" <|
+        , test "Drop keeps the maximum size of the sliding list" <|
             \_ ->
                 testSlidingListWithSize 3
                     |> SlidingList.cons "A"
@@ -357,7 +357,7 @@ appendTests =
                     |> SlidingList.append [ "B", "C", "D" ]
                     |> SlidingList.items
                     |> Expect.equal [ "D", "C", "B" ]
-        , test "Append keeps the maximum size of the list" <|
+        , test "Append keeps the maximum size of the sliding list" <|
             \_ ->
                 testSlidingListWithSize 3
                     |> SlidingList.cons "A"
@@ -371,11 +371,38 @@ appendTests =
                     |> SlidingList.append []
                     |> SlidingList.items
                     |> Expect.equal [ "A", "B" ]
-        ,test "Append with enough space does not slide elements out" <|
+        , test "Append with enough space does not slide elements out" <|
             \_ ->
                 testSlidingListWithSize 3
                     |> SlidingList.cons "A"
                     |> SlidingList.append [ "B" ]
                     |> SlidingList.items
                     |> Expect.equal [ "B", "A" ]
+        ]
+
+
+mapTests : Test
+mapTests =
+    describe "map tests"
+        [ test "Map works as expected" <|
+            \_ ->
+                [ "A", "B" ]
+                    |> SlidingList.fromList (adHocPositiveInt 3)
+                    |> SlidingList.map String.toLower
+                    |> SlidingList.items
+                    |> Expect.equal [ "a", "b" ]
+        , test "Map keeps the maximum size of the sliding list" <|
+            \_ ->
+                testSlidingListWithSize 3
+                    |> SlidingList.cons 1
+                    |> SlidingList.map ((*) 2)
+                    |> SlidingList.maximumSize
+                    |> Expect.equal 3
+        , test "Map allows changing the type of the sliding list" <|
+            \_ ->
+                [ 1, 2 ]
+                    |> SlidingList.fromList (adHocPositiveInt 3)
+                    |> SlidingList.map toString
+                    |> SlidingList.items
+                    |> Expect.equal [ "1", "2" ]
         ]
