@@ -154,7 +154,7 @@ reverseTests =
                     |> SlidingList.reverse
                     |> SlidingList.items
                     |> Expect.equal [ "A", "B" ]
-        , test "Reversing a sliding list keeps its maximum size" <|
+        , test "After reversing a list, cons still works as expected" <|
             \_ ->
                 testSlidingListWithSize 3
                     |> SlidingList.cons "A"
@@ -163,6 +163,14 @@ reverseTests =
                     |> SlidingList.cons "C"
                     |> SlidingList.items
                     |> Expect.equal [ "C", "A", "B" ]
+        , test "Reversing a sliding list keeps its maximum size" <|
+            \_ ->
+                testSlidingListWithSize 3
+                    |> SlidingList.cons "A"
+                    |> SlidingList.cons "B"
+                    |> SlidingList.reverse
+                    |> SlidingList.maximumSize
+                    |> Expect.equal 3
         ]
 
 
