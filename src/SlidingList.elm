@@ -88,7 +88,7 @@ type SlidingList a
     = SlidingList (List a) Int
 
 
-{-| An opaque data type to hold an integer that is greater than 1.
+{-| An opaque data type to hold an integer that is greater than 0.
 -}
 type PositiveInt
     = PositiveInt Int
