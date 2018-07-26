@@ -21,6 +21,7 @@ module SlidingList
         , drop
         , append
         , map
+        , foldr
         )
 
 {-| A data type that holds an upper bounded sliding list.
@@ -66,6 +67,11 @@ the maximum size:
 # Mapping
 
 @docs map
+
+
+# Folding
+
+@docs foldr
 
 
 # Opaque data types
@@ -252,3 +258,10 @@ map fn (SlidingList items size) =
     fromList
         (PositiveInt size)
         (items |> List.map fn)
+
+
+{-| Reduce the items of this sliding list from the right.
+-}
+foldr : (a -> b -> b) -> b -> SlidingList a -> b
+foldr fn init (SlidingList items _) =
+    List.foldr fn init items

@@ -437,3 +437,15 @@ mapTests =
                     |> SlidingList.items
                     |> Expect.equal [ "1", "2" ]
         ]
+
+
+foldrTests : Test
+foldrTests =
+    describe "foldr tests"
+        [ test "Foldr works as expected" <|
+            \_ ->
+                [ "B", "C" ]
+                    |> SlidingList.fromList (adHocPositiveInt 3)
+                    |> SlidingList.foldr (++) "A"
+                    |> Expect.equal "BCA"
+        ]
