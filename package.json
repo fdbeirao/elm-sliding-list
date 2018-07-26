@@ -24,6 +24,8 @@
   },
   "homepage": "https://github.com/fdbeirao/elm-sliding-list#readme",
   "dependencies": {
+    "binstall": "1.2.0",
+    "chalk": "2.1.0",
     "node-elm-compiler": "4.3.3"
   },
   "devDependencies": {
