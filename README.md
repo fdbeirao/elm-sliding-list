@@ -4,7 +4,8 @@
 
 This package gives you a sliding list. You can specify that you wish to have a list
 that will have at most `n` items. For instance, maybe you want a list that can have
-at most 3 items. The moment you add a 4th item to this list, the oldest item will be dropped, thus ensuring you will only have a maximum of 3 items.
+at most 3 items. The moment you add a 4th item to this list, the oldest item will be
+dropped, thus ensuring you will only have a maximum of 3 items.
 
 The maximum number of items in a list must be greater than zero, therefore you need
 to use the `positiveInt` function, which will return a `Just` if this criteria was
