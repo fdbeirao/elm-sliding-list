@@ -449,3 +449,15 @@ foldrTests =
                     |> SlidingList.foldr (++) "A"
                     |> Expect.equal "BCA"
         ]
+
+
+foldlTests : Test
+foldlTests =
+    describe "foldl tests"
+        [ test "Foldl works as expected" <|
+            \_ ->
+                [ "B", "C" ]
+                    |> SlidingList.fromList (adHocPositiveInt 3)
+                    |> SlidingList.foldl (++) "A"
+                    |> Expect.equal "CBA"
+        ]
