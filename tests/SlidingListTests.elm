@@ -1,8 +1,8 @@
 module SlidingListTests exposing (..)
 
-import SlidingList
 import Expect exposing (Expectation)
-import Test exposing (Test, test, describe)
+import SlidingList
+import Test exposing (Test, describe, test)
 
 
 positiveIntTests : Test
@@ -144,8 +144,8 @@ reverseTests =
                         initialList
                             |> SlidingList.reverse
                 in
-                    reversedList
-                        |> Expect.equal initialList
+                reversedList
+                    |> Expect.equal initialList
         , test "Reversing a sliding list reverses its items" <|
             \_ ->
                 testSlidingListWithSize 2

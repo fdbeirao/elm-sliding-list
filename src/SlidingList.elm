@@ -1,28 +1,28 @@
 module SlidingList
     exposing
-        ( SlidingList
-        , PositiveInt
-        , positiveInt
-        , newSlidingList
-        , fromList
-        , isEmpty
+        ( PositiveInt
+        , SlidingList
+        , append
+        , availableSpace
         , cons
+        , drop
+        , filter
+        , foldl
+        , foldr
+        , fromList
+        , head
+        , isEmpty
         , items
         , length
-        , reverse
-        , availableSpace
-        , maximumSize
-        , resize
-        , member
-        , head
-        , tail
-        , filter
-        , take
-        , drop
-        , append
         , map
-        , foldr
-        , foldl
+        , maximumSize
+        , member
+        , newSlidingList
+        , positiveInt
+        , resize
+        , reverse
+        , tail
+        , take
         )
 
 {-| A data type that holds an upper bounded sliding list.
@@ -226,7 +226,7 @@ filter fn (SlidingList list size) =
     SlidingList (list |> List.filter fn) size
 
 
-{-| Take the first *n* items of this list into a new sliding list.
+{-| Take the first _n_ items of this list into a new sliding list.
 The new sliding list will have the same maximum items as the previous
 one.
 -}
@@ -235,7 +235,7 @@ take howMany (SlidingList list size) =
     SlidingList (list |> List.take howMany) size
 
 
-{-| Drop the first *n* items of this list. The new sliding list will have
+{-| Drop the first _n_ items of this list. The new sliding list will have
 the same maximum items as the previous one.
 -}
 drop : Int -> SlidingList a -> SlidingList a
