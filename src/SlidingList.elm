@@ -1,7 +1,6 @@
 module SlidingList
     exposing
-        ( PositiveInt
-        , SlidingList
+        ( SlidingList
         , append
         , availableSpace
         , cons
@@ -17,8 +16,7 @@ module SlidingList
         , map
         , maximumSize
         , member
-        , newSlidingList
-        , positiveInt
+        , new
         , resize
         , reverse
         , tail
@@ -27,27 +25,35 @@ module SlidingList
 
 {-| A data type that holds an upper bounded sliding list.
 
-When you create a `SlidingList` you specify the maximum
-number of items that it can hold. This module is heavily
-inspired by the [elm-lang/core/List](http://package.elm-lang.org/packages/elm-lang/core/latest/List)
+When you create a `SlidingList` you specify the maximum number of items that it
+can hold.
+
+⚠ Keep in mind that zero or negative size lists do notreally make sense so the
+minimum size of a sliding list is 1.
+
+The public interface of module is heavily inspired by the
+[elm-lang/core/List](http://package.elm-lang.org/packages/elm-lang/core/latest/List)
 module.
 
-When you create a sliding list, you can `cons` items into it, and it will slide after
-the maximum size:
+When you create a sliding list, you can `cons` items intoit, and it will slide
+after the maximum size:
 
-    positiveInt 2
-        |> Maybe.map (
-            newSlidingList
-            >> cons "A"
-            >> cons "B"
-            >> cons "C"
-            >> items
-        ) == Just [ "C", "B" ]
+    new 2
+        |> cons "A"
+        |> cons "B"
+        |> cons "C"
+        |> items
+        == [ "C", "B" ]
+
+    [ "A", "B", "C" ]
+        |> fromList 2
+        |> items
+        == [ "B", "C" ]
 
 
 # Creating a sliding list
 
-@docs positiveInt, newSlidingList, fromList, resize, availableSpace, maximumSize
+@docs new, fromList, resize, availableSpace, maximumSize
 
 
 # Basics
@@ -77,7 +83,7 @@ the maximum size:
 
 # Opaque data types
 
-@docs SlidingList, PositiveInt
+@docs SlidingList
 
 -}
 
@@ -88,50 +94,40 @@ type SlidingList a
     = SlidingList (List a) Int
 
 
-{-| An opaque data type to hold an integer that is greater than 0.
--}
-type PositiveInt
-    = PositiveInt Int
+{-| Create a new empty sliding list with the specified maximum size.
 
-
-{-| Obtain a `PositiveInt`. The argument must be greater than 0.
-
-    positiveInt 5 == Just PositiveInt
-    positiveInt 0 == Nothing
-    positiveInt -10 == Nothing
+Keep in mind that zero or negative size lists do not really make sense so the
+minimum size of a sliding list is 1.
 
 -}
-positiveInt : Int -> Maybe PositiveInt
-positiveInt i =
-    if i > 0 then
-        Just (PositiveInt i)
-    else
-        Nothing
-
-
-{-| Create a new empty SlidingList.
--}
-newSlidingList : PositiveInt -> SlidingList a
-newSlidingList size =
+new : Int -> SlidingList a
+new size =
     fromList size []
 
 
-{-| Create a new SlidingList from an existing List.
+{-| Create a new sliding list from an existing list, with the specified maximum
+size.
 
-If the size of the initial list is greater than the maximum
-size of the sliding list, the sliding list will slide, as
-expected.
+Keep in mind that zero or negative size lists do not really make sense so the
+minimum size of a sliding list is 1.
+
+If the size of the initial list is greater than the maximum size of the sliding
+list, the sliding list will slide, as expected.
 
 -}
-fromList : PositiveInt -> List a -> SlidingList a
-fromList (PositiveInt size) list =
-    SlidingList
-        (list
-            |> List.reverse
-            |> List.take size
-            |> List.reverse
-        )
-        size
+fromList : Int -> List a -> SlidingList a
+fromList size list =
+    let
+        newList =
+            if List.length list <= size then
+                list
+            else
+                list
+                    |> List.reverse
+                    |> List.take size
+                    |> List.reverse
+    in
+    SlidingList newList (max 1 size)
 
 
 {-| Determine if this sliding list is empty.
@@ -141,8 +137,8 @@ isEmpty (SlidingList list _) =
     List.isEmpty list
 
 
-{-| Add an element to the front of the sliding list, sliding
-if it exceeds the maximum size of the sliding list.
+{-| Add an element to the front of the sliding list, sliding if it exceeds the
+maximum size of the sliding list.
 -}
 cons : a -> SlidingList a -> SlidingList a
 cons item (SlidingList list size) =
@@ -163,37 +159,40 @@ length (SlidingList list _) =
     List.length list
 
 
-{-| Reverse this sliding list in place, returning a new
-sliding list with the same maximum size.
+{-| Reverse this sliding list in place, returning a new sliding list with the
+same maximum size.
+
+Keep in mind that zero or negative size lists do not really make sense so the
+minimum size of a sliding list is 1. Additionally, if you resize the list to
+zero or a negative number, it will be cleared.
+
 -}
 reverse : SlidingList a -> SlidingList a
 reverse (SlidingList list size) =
     SlidingList (list |> List.reverse) size
 
 
-{-| Obtain how much available space there is left, before
-this list starts to slide.
+{-| Obtain how much available space there is left, before this list starts to
+slide.
 -}
 availableSpace : SlidingList a -> Int
 availableSpace (SlidingList list size) =
     size - (list |> List.length)
 
 
-{-| Obtain the current maximum size allowed for this
-sliding list.
+{-| Obtain the current maximum size allowed for this sliding list.
 -}
 maximumSize : SlidingList a -> Int
 maximumSize (SlidingList _ size) =
     size
 
 
-{-| Resize this sliding list. If the new size is smaller than
-the current held number of items in the list, it will slide, as
-expected.
+{-| Resize this sliding list. If the new size is smaller than the current held
+number of items in the list, it will slide, as expected.
 -}
-resize : PositiveInt -> SlidingList a -> SlidingList a
-resize (PositiveInt size) (SlidingList list _) =
-    SlidingList (list |> List.take size) size
+resize : Int -> SlidingList a -> SlidingList a
+resize newSize (SlidingList list _) =
+    fromList newSize (list |> List.take newSize)
 
 
 {-| Determine if an item is a member of this current sliding list.
@@ -217,9 +216,11 @@ tail (SlidingList list _) =
     list |> List.tail
 
 
-{-| Filter this sliding list in place, keeping only the items
-that satisfy the predicate. The new sliding list will have the
-same maximum items as the previous one.
+{-| Filter this sliding list in place, keeping only the items that satisfy the
+predicate.
+
+The new sliding list will have the same maximum items as the previous one.
+
 -}
 filter : (a -> Bool) -> SlidingList a -> SlidingList a
 filter fn (SlidingList list size) =
@@ -227,16 +228,17 @@ filter fn (SlidingList list size) =
 
 
 {-| Take the first _n_ items of this list into a new sliding list.
-The new sliding list will have the same maximum items as the previous
-one.
+
+The new sliding list will have the same maximum items as the previous one.
+
 -}
 take : Int -> SlidingList a -> SlidingList a
 take howMany (SlidingList list size) =
     SlidingList (list |> List.take howMany) size
 
 
-{-| Drop the first _n_ items of this list. The new sliding list will have
-the same maximum items as the previous one.
+{-| Drop the first _n_ items of this list. The new sliding list will have the
+same maximum items as the previous one.
 -}
 drop : Int -> SlidingList a -> SlidingList a
 drop howMany (SlidingList list size) =
@@ -244,8 +246,10 @@ drop howMany (SlidingList list size) =
 
 
 {-| Append a list of elements to this sliding list.
-Each element will be treated as if it had been cons'd by their
-order in the incoming list.
+
+Each element will be treated as if it had been cons'd by their order in the
+incoming list.
+
 -}
 append : List a -> SlidingList a -> SlidingList a
 append newItems list =
@@ -257,7 +261,7 @@ append newItems list =
 map : (a -> b) -> SlidingList a -> SlidingList b
 map fn (SlidingList items size) =
     fromList
-        (PositiveInt size)
+        size
         (items |> List.map fn)
 
 

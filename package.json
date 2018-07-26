@@ -1,7 +1,7 @@
 {
   "name": "elm-sliding-list",
-  "version": "1.0.0",
-  "description": "A List that automatically slides",
+  "version": "2.0.0",
+  "description": "A list that automatically slides",
   "directories": {
     "test": "tests"
   },
