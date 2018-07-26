@@ -1,0 +1,36 @@
+{
+  "name": "elm-sliding-list",
+  "version": "1.0.0",
+  "description": "A List that automatically slides",
+  "directories": {
+    "test": "tests"
+  },
+  "scripts": {
+    "test": "elm-test",
+    "format": "elm-format --elm-version=0.18 src tests"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/fdbeirao/elm-sliding-list.git"
+  },
+  "keywords": [
+    "elm",
+    "list"
+  ],
+  "author": "Fábio Beirão <fdbeirao@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/fdbeirao/elm-sliding-list/issues"
+  },
+  "homepage": "https://github.com/fdbeirao/elm-sliding-list#readme",
+  "dependencies": {
+    "node-elm-compiler": "4.3.3"
+  },
+  "devDependencies": {
+    "elm-format": "^0.7.0-exp"
+  },
+  "engineStrict": true,
+  "engines": {
+    "node": ">=4.0.0"
+  }
+}

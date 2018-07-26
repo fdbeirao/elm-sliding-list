@@ -2,7 +2,7 @@ sudo: false
 
 cache:
   directories:
-    - test/elm-stuff/build-artifacts
+    - tests/elm-stuff/build-artifacts
     - sysconfcpus
 
 language: node_js
@@ -11,6 +11,9 @@ node_js:
   - "0.12"
 
 before_install:
+  - if [ ${TRAVIS_OS_NAME} == "osx" ];
+    then brew update; brew install nvm; mkdir ~/.nvm; export NVM_DIR=~/.nvm; source $(brew --prefix nvm)/nvm.sh;
+    fi
   - echo -e "Host github.com\n\tStrictHostKeyChecking no\n" >> ~/.ssh/config
   - | # epic build time improvement - see https://github.com/elm-lang/elm-compiler/issues/1473#issuecomment-245704142
     if [ ! -d sysconfcpus/bin ];
@@ -23,7 +26,16 @@ before_install:
     fi
 
 install:
-  - npm install -g elm@0.18.0 elm-test
+  - npm install -g elm@0.18.0 elm-test@0.18.12 elm-format@rc
+  - mv $(npm config get prefix)/bin/elm-make $(npm config get prefix)/bin/elm-make-old
+  - printf '%s\n\n' '#!/bin/bash' 'echo "Running elm-make with sysconfcpus -n 2"' '$TRAVIS_BUILD_DIR/sysconfcpus/bin/sysconfcpus -n 2 elm-make-old "$@"' > $(npm config get prefix)/bin/elm-make
+  - chmod +x $(npm config get prefix)/bin/elm-make
+  - travis_retry elm-package install --yes
+  - cd tests
+  - npm install
+  - travis_retry elm-package install --yes
+  - cd ..
 
 script:
-  - elm-test
+  - elm-format --validate src tests
+  - npm test
