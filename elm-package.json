@@ -1,5 +1,5 @@
 {
-    "version": "2.0.2",
+    "version": "3.0.0",
     "summary": "A List that automatically slides",
     "repository": "https://github.com/fdbeirao/elm-sliding-list.git",
     "license": "MIT",

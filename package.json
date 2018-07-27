@@ -1,13 +1,13 @@
 {
   "name": "elm-sliding-list",
-  "version": "2.0.2",
+  "version": "3.0.0",
   "description": "A list that automatically slides",
   "directories": {
     "test": "tests"
   },
   "scripts": {
     "test": "elm-test",
-    "format": "elm-format --elm-version=0.18 src tests"
+    "format": "elm-format --elm-version=0.18 src tests example"
   },
   "repository": {
     "type": "git",
