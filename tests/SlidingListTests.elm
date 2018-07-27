@@ -5,6 +5,66 @@ import SlidingList
 import Test exposing (Test, describe, test)
 
 
+usageExample : Test
+usageExample =
+    describe "Usage examples"
+        [ test "Inserting 4 elements, one at a time, onto a list with maximum capacity 2" <|
+            \_ ->
+                let
+                    emptyList =
+                        SlidingList.new 2
+
+                    list1 =
+                        emptyList |> SlidingList.insert "a"
+
+                    list2 =
+                        list1 |> SlidingList.insert "b"
+
+                    list3 =
+                        list2 |> SlidingList.insert "c"
+
+                    list4 =
+                        list3 |> SlidingList.insert "d"
+                in
+                ()
+                    |> Expect.all
+                        [ \_ -> emptyList |> SlidingList.items |> Expect.equal []
+                        , \_ -> list1 |> SlidingList.items |> Expect.equal [ "a" ]
+                        , \_ -> list2 |> SlidingList.items |> Expect.equal [ "a", "b" ]
+                        , \_ -> list3 |> SlidingList.items |> Expect.equal [ "b", "c" ]
+                        , \_ -> list4 |> SlidingList.items |> Expect.equal [ "c", "d" ]
+                        ]
+        , test "InsertAll works like if you had run insert for each element of the incomming list" <|
+            \_ ->
+                let
+                    emptyList =
+                        SlidingList.new 2
+
+                    list1 =
+                        emptyList |> SlidingList.insertAll [ "a" ]
+
+                    list2 =
+                        list1 |> SlidingList.insertAll [ "b", "c" ]
+
+                    list3 =
+                        list2 |> SlidingList.insertAll [ "d" ]
+                in
+                ()
+                    |> Expect.all
+                        [ \_ -> emptyList |> SlidingList.items |> Expect.equal []
+                        , \_ -> list1 |> SlidingList.items |> Expect.equal [ "a" ]
+                        , \_ -> list2 |> SlidingList.items |> Expect.equal [ "b", "c" ]
+                        , \_ -> list3 |> SlidingList.items |> Expect.equal [ "c", "d" ]
+                        ]
+        , test "Creating a sliding list from an existing list will slide it" <|
+            \_ ->
+                [ "a", "b", "c" ]
+                    |> SlidingList.fromList 2
+                    |> SlidingList.items
+                    |> Expect.equal [ "b", "c" ]
+        ]
+
+
 newTests : Test
 newTests =
     describe "new tests"
@@ -42,7 +102,7 @@ isEmptyTests =
         , test "Non empty list should not be empty" <|
             \_ ->
                 SlidingList.new 5
-                    |> SlidingList.cons "str"
+                    |> SlidingList.insert "str"
                     |> SlidingList.isEmpty
                     |> Expect.equal False
         ]
@@ -102,16 +162,57 @@ fromListTests =
         ]
 
 
-consTests : Test
-consTests =
-    describe "cons (::) tests"
-        [ test "Adding 2 items to a maximum size 1 sliding list should only keep the last one" <|
+insertTests : Test
+insertTests =
+    describe "insert tests"
+        [ test "Inserting 2 items into a maximum size 1 sliding list should only keep the last one" <|
             \_ ->
                 SlidingList.new 1
-                    |> SlidingList.cons 1
-                    |> SlidingList.cons 2
+                    |> SlidingList.insert 1
+                    |> SlidingList.insert 2
                     |> SlidingList.items
                     |> Expect.equal [ 2 ]
+        , test "Inserting fewer items than the maximum size of the sliding list should keep their order and not slide them" <|
+            \_ ->
+                SlidingList.new 3
+                    |> SlidingList.insert "A"
+                    |> SlidingList.insert "B"
+                    |> SlidingList.items
+                    |> Expect.equal [ "A", "B" ]
+        ]
+
+
+insertAllTests : Test
+insertAllTests =
+    describe "insertAll tests"
+        [ test "insertAll treats each element of the new list as if they had been individually inserted" <|
+            \_ ->
+                SlidingList.new 3
+                    |> SlidingList.insert "A"
+                    |> SlidingList.insertAll [ "B", "C", "D" ]
+                    |> SlidingList.items
+                    |> Expect.equal [ "B", "C", "D" ]
+        , test "insertAll keeps the maximum size of the sliding list" <|
+            \_ ->
+                SlidingList.new 3
+                    |> SlidingList.insert "A"
+                    |> SlidingList.insertAll [ "B", "C", "D" ]
+                    |> SlidingList.maximumSize
+                    |> Expect.equal 3
+        , test "insertAll of an empty list keeps the original list" <|
+            \_ ->
+                [ "A", "B" ]
+                    |> SlidingList.fromList 3
+                    |> SlidingList.insertAll []
+                    |> SlidingList.items
+                    |> Expect.equal [ "A", "B" ]
+        , test "insertAll with enough space does not slide elements out" <|
+            \_ ->
+                SlidingList.new 3
+                    |> SlidingList.insert "A"
+                    |> SlidingList.insertAll [ "B" ]
+                    |> SlidingList.items
+                    |> Expect.equal [ "A", "B" ]
         ]
 
 
@@ -126,14 +227,14 @@ lengthTests =
         , test "The length of a sliding list with maximum size 5, but only 1 element is 1" <|
             \_ ->
                 SlidingList.new 5
-                    |> SlidingList.cons "item"
+                    |> SlidingList.insert "item"
                     |> SlidingList.length
                     |> Expect.equal 1
-        , test "The length of a sliding list with maximum size 1, after trying to cons 2 elements is 1" <|
+        , test "The length of a sliding list with maximum size 1, after trying to insert 2 elements is still 1" <|
             \_ ->
                 SlidingList.new 1
-                    |> SlidingList.cons "1"
-                    |> SlidingList.cons "2"
+                    |> SlidingList.insert "1"
+                    |> SlidingList.insert "2"
                     |> SlidingList.length
                     |> Expect.equal 1
         ]
@@ -147,9 +248,9 @@ reverseTests =
                 let
                     initialList =
                         SlidingList.new 3
-                            |> SlidingList.cons "A"
-                            |> SlidingList.cons "B"
-                            |> SlidingList.cons "A"
+                            |> SlidingList.insert "A"
+                            |> SlidingList.insert "B"
+                            |> SlidingList.insert "A"
 
                     reversedList =
                         initialList
@@ -160,25 +261,25 @@ reverseTests =
         , test "Reversing a sliding list reverses its items" <|
             \_ ->
                 SlidingList.new 2
-                    |> SlidingList.cons "A"
-                    |> SlidingList.cons "B"
+                    |> SlidingList.insert "A"
+                    |> SlidingList.insert "B"
                     |> SlidingList.reverse
                     |> SlidingList.items
-                    |> Expect.equal [ "A", "B" ]
-        , test "After reversing a list, cons still works as expected" <|
+                    |> Expect.equal [ "B", "A" ]
+        , test "After reversing a list, insert still works as expected" <|
             \_ ->
                 SlidingList.new 3
-                    |> SlidingList.cons "A"
-                    |> SlidingList.cons "B"
+                    |> SlidingList.insert "A"
+                    |> SlidingList.insert "B"
                     |> SlidingList.reverse
-                    |> SlidingList.cons "C"
+                    |> SlidingList.insert "C"
                     |> SlidingList.items
-                    |> Expect.equal [ "C", "A", "B" ]
+                    |> Expect.equal [ "B", "A", "C" ]
         , test "Reversing a sliding list keeps its maximum size" <|
             \_ ->
                 SlidingList.new 3
-                    |> SlidingList.cons "A"
-                    |> SlidingList.cons "B"
+                    |> SlidingList.insert "A"
+                    |> SlidingList.insert "B"
                     |> SlidingList.reverse
                     |> SlidingList.maximumSize
                     |> Expect.equal 3
@@ -196,13 +297,13 @@ availableSpaceTests =
         , test "The available space of a list with maximum size 3 and one element is 2" <|
             \_ ->
                 SlidingList.new 3
-                    |> SlidingList.cons "A"
+                    |> SlidingList.insert "A"
                     |> SlidingList.availableSpace
                     |> Expect.equal 2
         , test "The available space of a full list is zero" <|
             \_ ->
                 SlidingList.new 1
-                    |> SlidingList.cons "A"
+                    |> SlidingList.insert "A"
                     |> SlidingList.availableSpace
                     |> Expect.equal 0
         ]
@@ -228,43 +329,51 @@ resizeTests =
                     |> SlidingList.resize 1
                     |> SlidingList.maximumSize
                     |> Expect.equal 1
-        , test "Shortening a sliding list truncates it" <|
+        , test "Shortening a sliding list makes it slide to the new available space" <|
             \_ ->
                 SlidingList.new 2
-                    |> SlidingList.cons "A"
-                    |> SlidingList.cons "B"
+                    |> SlidingList.insert "A"
+                    |> SlidingList.insert "B"
                     |> SlidingList.resize 1
                     |> SlidingList.items
                     |> Expect.equal [ "B" ]
-        , test "Resizing a sliding list to zero clears it" <|
+        , test "Increasing the capacity of a sliding list makes keeps its items untouched" <|
             \_ ->
                 SlidingList.new 2
-                    |> SlidingList.cons "A"
-                    |> SlidingList.cons "B"
+                    |> SlidingList.insert "A"
+                    |> SlidingList.insert "B"
+                    |> SlidingList.resize 4
+                    |> SlidingList.items
+                    |> Expect.equal [ "A", "B" ]
+        , test "Resizing a sliding list to zero clears it, as specified in the documentation" <|
+            \_ ->
+                SlidingList.new 2
+                    |> SlidingList.insert "A"
+                    |> SlidingList.insert "B"
                     |> SlidingList.resize 0
                     |> SlidingList.items
                     |> Expect.equal []
-        , test "Resizing a sliding list to a negative number clears it" <|
+        , test "Resizing a sliding list to a negative number clears it, as specified in the documentation" <|
             \_ ->
                 SlidingList.new 2
-                    |> SlidingList.cons "A"
-                    |> SlidingList.cons "B"
+                    |> SlidingList.insert "A"
+                    |> SlidingList.insert "B"
                     |> SlidingList.resize -5
                     |> SlidingList.items
                     |> Expect.equal []
         , test "Resizing a sliding list to zero makes its maximum size become 1, as specified in the documentation" <|
             \_ ->
                 SlidingList.new 2
-                    |> SlidingList.cons "A"
-                    |> SlidingList.cons "B"
+                    |> SlidingList.insert "A"
+                    |> SlidingList.insert "B"
                     |> SlidingList.resize 0
                     |> SlidingList.maximumSize
                     |> Expect.equal 1
         , test "Resizing a sliding list to a negative number makes its maximum size become 1, as specified in the documentation" <|
             \_ ->
                 SlidingList.new 2
-                    |> SlidingList.cons "A"
-                    |> SlidingList.cons "B"
+                    |> SlidingList.insert "A"
+                    |> SlidingList.insert "B"
                     |> SlidingList.resize -5
                     |> SlidingList.maximumSize
                     |> Expect.equal 1
@@ -277,181 +386,22 @@ memberTests =
         [ test "An existing item should be a member of the sliding list" <|
             \_ ->
                 SlidingList.new 2
-                    |> SlidingList.cons "A"
+                    |> SlidingList.insert "A"
                     |> SlidingList.member "A"
                     |> Expect.equal True
         , test "A non-existing item should not be a member of the sliding list" <|
             \_ ->
                 SlidingList.new 2
-                    |> SlidingList.cons "A"
+                    |> SlidingList.insert "A"
                     |> SlidingList.member "B"
                     |> Expect.equal False
         , test "An item that has been slided out of the list is no longer a member" <|
             \_ ->
                 SlidingList.new 1
-                    |> SlidingList.cons "A"
-                    |> SlidingList.cons "B"
+                    |> SlidingList.insert "A"
+                    |> SlidingList.insert "B"
                     |> SlidingList.member "A"
                     |> Expect.equal False
-        ]
-
-
-headTests : Test
-headTests =
-    describe "head tests"
-        [ test "The head of an empty sliding list is Nothing" <|
-            \_ ->
-                SlidingList.new 1
-                    |> SlidingList.head
-                    |> Expect.equal Nothing
-        , test "The head of a non empty list should be the last added item" <|
-            \_ ->
-                SlidingList.new 2
-                    |> SlidingList.cons "A"
-                    |> SlidingList.cons "B"
-                    |> SlidingList.head
-                    |> Expect.equal (Just "B")
-        ]
-
-
-tailTests : Test
-tailTests =
-    describe "tail tests"
-        [ test "The tail of an empty sliding list is Nothing" <|
-            \_ ->
-                SlidingList.new 1
-                    |> SlidingList.tail
-                    |> Expect.equal Nothing
-        , test "The tail of a sliding list with one single element is an empty list" <|
-            \_ ->
-                SlidingList.new 1
-                    |> SlidingList.cons "A"
-                    |> SlidingList.tail
-                    |> Expect.equal (Just [])
-        , test "The tail of a sliding list with multiple elements is the expected tail" <|
-            \_ ->
-                SlidingList.new 3
-                    |> SlidingList.cons "A"
-                    |> SlidingList.cons "B"
-                    |> SlidingList.cons "C"
-                    |> SlidingList.tail
-                    |> Expect.equal (Just [ "B", "A" ])
-        ]
-
-
-filterTests : Test
-filterTests =
-    describe "filter tests"
-        [ test "Filter works as expected" <|
-            \_ ->
-                SlidingList.new 4
-                    |> SlidingList.cons 1
-                    |> SlidingList.cons 2
-                    |> SlidingList.cons 3
-                    |> SlidingList.cons 4
-                    |> SlidingList.filter (\i -> i % 2 == 0)
-                    |> SlidingList.items
-                    |> Expect.equal [ 4, 2 ]
-        , test "Filter keeps the maximum size of the sliding list" <|
-            \_ ->
-                SlidingList.new 4
-                    |> SlidingList.cons 1
-                    |> SlidingList.cons 2
-                    |> SlidingList.cons 3
-                    |> SlidingList.cons 4
-                    |> SlidingList.filter (\i -> i % 2 == 0)
-                    |> SlidingList.maximumSize
-                    |> Expect.equal 4
-        ]
-
-
-takeTests : Test
-takeTests =
-    describe "take tests"
-        [ test "Take works as expected" <|
-            \_ ->
-                SlidingList.new 3
-                    |> SlidingList.cons "A"
-                    |> SlidingList.cons "B"
-                    |> SlidingList.take 1
-                    |> SlidingList.items
-                    |> Expect.equal [ "B" ]
-        , test "Take keeps the maximum size of the sliding list" <|
-            \_ ->
-                SlidingList.new 3
-                    |> SlidingList.cons "A"
-                    |> SlidingList.cons "B"
-                    |> SlidingList.take 1
-                    |> SlidingList.maximumSize
-                    |> Expect.equal 3
-        , test "Take from an empty list is still an empty list" <|
-            \_ ->
-                SlidingList.new 3
-                    |> SlidingList.take 1
-                    |> SlidingList.isEmpty
-                    |> Expect.equal True
-        ]
-
-
-dropTests : Test
-dropTests =
-    describe "drop tests"
-        [ test "Drop works as expected" <|
-            \_ ->
-                SlidingList.new 3
-                    |> SlidingList.cons "A"
-                    |> SlidingList.cons "B"
-                    |> SlidingList.drop 1
-                    |> SlidingList.items
-                    |> Expect.equal [ "A" ]
-        , test "Drop keeps the maximum size of the sliding list" <|
-            \_ ->
-                SlidingList.new 3
-                    |> SlidingList.cons "A"
-                    |> SlidingList.cons "B"
-                    |> SlidingList.drop 1
-                    |> SlidingList.maximumSize
-                    |> Expect.equal 3
-        , test "Drop from an empty list is still an empty list" <|
-            \_ ->
-                SlidingList.new 3
-                    |> SlidingList.drop 1
-                    |> SlidingList.isEmpty
-                    |> Expect.equal True
-        ]
-
-
-appendTests : Test
-appendTests =
-    describe "append tests"
-        [ test "Append treats each element of the new list as if they had been cons'd" <|
-            \_ ->
-                SlidingList.new 3
-                    |> SlidingList.cons "A"
-                    |> SlidingList.append [ "B", "C", "D" ]
-                    |> SlidingList.items
-                    |> Expect.equal [ "D", "C", "B" ]
-        , test "Append keeps the maximum size of the sliding list" <|
-            \_ ->
-                SlidingList.new 3
-                    |> SlidingList.cons "A"
-                    |> SlidingList.append [ "B", "C", "D" ]
-                    |> SlidingList.maximumSize
-                    |> Expect.equal 3
-        , test "Append of an empty list keeps the original list" <|
-            \_ ->
-                [ "A", "B" ]
-                    |> SlidingList.fromList 3
-                    |> SlidingList.append []
-                    |> SlidingList.items
-                    |> Expect.equal [ "A", "B" ]
-        , test "Append with enough space does not slide elements out" <|
-            \_ ->
-                SlidingList.new 3
-                    |> SlidingList.cons "A"
-                    |> SlidingList.append [ "B" ]
-                    |> SlidingList.items
-                    |> Expect.equal [ "B", "A" ]
         ]
 
 
@@ -468,7 +418,7 @@ mapTests =
         , test "Map keeps the maximum size of the sliding list" <|
             \_ ->
                 SlidingList.new 3
-                    |> SlidingList.cons 1
+                    |> SlidingList.insert 1
                     |> SlidingList.map ((*) 2)
                     |> SlidingList.maximumSize
                     |> Expect.equal 3
@@ -479,28 +429,4 @@ mapTests =
                     |> SlidingList.map toString
                     |> SlidingList.items
                     |> Expect.equal [ "1", "2" ]
-        ]
-
-
-foldrTests : Test
-foldrTests =
-    describe "foldr tests"
-        [ test "Foldr works as expected" <|
-            \_ ->
-                [ "B", "C" ]
-                    |> SlidingList.fromList 3
-                    |> SlidingList.foldr (++) "A"
-                    |> Expect.equal "BCA"
-        ]
-
-
-foldlTests : Test
-foldlTests =
-    describe "foldl tests"
-        [ test "Foldl works as expected" <|
-            \_ ->
-                [ "B", "C" ]
-                    |> SlidingList.fromList 3
-                    |> SlidingList.foldl (++) "A"
-                    |> Expect.equal "CBA"
         ]
