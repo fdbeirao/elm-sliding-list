@@ -23,6 +23,8 @@ type alias Model =
 
 type Msg
     = InsertIntoList String
+    | IncreaseListSize
+    | DecreaseListSize
 
 
 
@@ -49,7 +51,33 @@ update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         InsertIntoList item ->
-            { model | theList = model.theList |> SlidingList.insert item } ! []
+            ( { model | theList = model.theList |> SlidingList.insert item }
+            , Cmd.none
+            )
+
+        IncreaseListSize ->
+            let
+                newDesiredListSize =
+                    model.desiredListSize + 1
+            in
+            ( { model
+                | desiredListSize = newDesiredListSize
+                , theList = model.theList |> SlidingList.resize newDesiredListSize
+              }
+            , Cmd.none
+            )
+
+        DecreaseListSize ->
+            let
+                newDesiredListSize =
+                    model.desiredListSize - 1
+            in
+            ( { model
+                | desiredListSize = newDesiredListSize
+                , theList = model.theList |> SlidingList.resize newDesiredListSize
+              }
+            , Cmd.none
+            )
 
 
 
@@ -78,52 +106,77 @@ listView : Model -> ViewResult v Msg
 listView model =
     column
         NoStyle
-        [ padding 10 ]
+        [ padding 10
+        , spacing 5
+        ]
         [ listItemsView model.theList
-        , listInfoView model.theList
+        , listInfoView model
         , addItemsView
         ]
 
 
 listItemsView : SlidingList String -> ViewResult v Msg
 listItemsView theList =
-    column NoStyle
+    row
+        NoStyle
         [ padding 10
         , spacing 10
         , center
         ]
-        [ text "Elements currently on the list:"
-        , row
-            NoStyle
-            [ padding 10, spacing 10 ]
-            [ "[ " ++ (theList |> SlidingList.items |> String.join ", ") ++ " ]" |> text ]
+        [ "Elements currently on the list:" |> text
+        , "[ " ++ (theList |> SlidingList.items |> String.join ", ") ++ " ]" |> text
         ]
 
 
-listInfoView : SlidingList a -> ViewResult v Msg
-listInfoView theList =
-    el
+listInfoView : Model -> ViewResult v Msg
+listInfoView model =
+    row
         NoStyle
-        [ padding 10 ]
-        ("Maximum items on the list: " ++ (theList |> SlidingList.maximumSize |> toString) |> text)
+        [ spacing 10 ]
+        [ button
+            NoStyle
+            [ padding 10
+            , onClick DecreaseListSize
+            ]
+            (text "-")
+        , column
+            NoStyle
+            [ spacing 5 ]
+            [ "Desired maximum items on the list: " ++ (model.desiredListSize |> toString) |> text
+            , "Actual maximum items on the list: " ++ (model.theList |> SlidingList.maximumSize |> toString) |> text
+            ]
+        , button
+            NoStyle
+            [ padding 10
+            , onClick IncreaseListSize
+            ]
+            (text "+")
+        ]
 
 
 addItemsView : ViewResult v Msg
 addItemsView =
-    row
+    column
         NoStyle
-        [ spacing 10 ]
-        ([ "A", "B", "C", "D", "E" ]
-            |> List.map
-                (\i ->
-                    button
-                        NoStyle
-                        [ padding 10
-                        , onClick <| InsertIntoList i
-                        ]
-                        (text i)
-                )
-        )
+        [ spacing 5 ]
+        [ text "Insert elements on the list:"
+        , row
+            NoStyle
+            [ spacing 10
+            , center
+            ]
+            ([ "A", "B", "C", "D", "E" ]
+                |> List.map
+                    (\i ->
+                        button
+                            NoStyle
+                            [ padding 10
+                            , onClick <| InsertIntoList i
+                            ]
+                            (text i)
+                    )
+            )
+        ]
 
 
 
