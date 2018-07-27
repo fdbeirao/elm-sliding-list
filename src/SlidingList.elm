@@ -20,18 +20,18 @@ module SlidingList
 
 When you create a `SlidingList` you specify the maximum number of items that it can hold.
 
+When you `insert` elements into this list, they will be added to the _end_ of the sliding list. This means than when you have more items than what your sliding list can hold, they will be dropped from the beginning of the list. `insertAll` works the same way, as if you had called `insert` for each element of the incoming list.
+
 ⚠ Keep in mind that zero or negative size lists do not really make sense so the minimum size of a sliding list is 1.
 
-The public interface of module is heavily inspired by the [elm-lang/core/List](http://package.elm-lang.org/packages/elm-lang/core/latest/List) module.
-
-When you create a sliding list, you can `cons` items into it, and it will slide after the maximum size:
+When you create a sliding list, you can `insert` items into it, and it will slide after the maximum size:
 
     new 2
-        |> cons "A"
-        |> cons "B"
-        |> cons "C"
+        |> insert "A"
+        |> insert "B"
+        |> insert "C"
         |> items
-        == [ "C", "B" ]
+        == [ "B", "C" ]
 
     [ "A", "B", "C" ]
         |> fromList 2
@@ -41,12 +41,17 @@ When you create a sliding list, you can `cons` items into it, and it will slide 
 
 # Creating a sliding list
 
-@docs new, fromList, resize
+@docs new, fromList
 
 
 # Obtaining information about a sliding list
 
 @docs availableSpace, maximumSize, items
+
+
+# Resizing a sliding list
+
+@docs resize
 
 
 # Basics
@@ -103,7 +108,7 @@ isEmpty (SlidingList list _) =
     List.isEmpty list
 
 
-{-| Add an element to the end of the sliding list, dropping elements from the beginning of the list if it exceeds the maximum size of the sliding list.
+{-| Add an element to the end of this sliding list, dropping elements from the beginning of the list if it exceeds the maximum size of the sliding list.
 -}
 insert : a -> SlidingList a -> SlidingList a
 insert item (SlidingList list size) =
