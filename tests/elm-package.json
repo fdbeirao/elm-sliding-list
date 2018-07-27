@@ -1,8 +1,8 @@
 {
     "version": "1.0.0",
-    "summary": "A List that automatically slides",
+    "summary": "Tests for the SlidingList package",
     "repository": "https://github.com/fdbeirao/elm-sliding-list.git",
-    "license": "BSD3",
+    "license": "MIT",
     "source-directories": [
         "../src",
         "."
