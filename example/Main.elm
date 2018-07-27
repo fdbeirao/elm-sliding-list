@@ -1,8 +1,10 @@
 module Main exposing (main)
 
-import Element exposing (el, text)
-import Element.Attributes exposing (center, verticalCenter)
+import Element exposing (button, column, el, row, text)
+import Element.Attributes exposing (center, padding, spacing, verticalCenter)
+import Element.Events exposing (onClick)
 import Html exposing (Html)
+import SlidingList exposing (SlidingList)
 import Style exposing (style)
 
 
@@ -10,7 +12,8 @@ import Style exposing (style)
 
 
 type alias Model =
-    { message : String
+    { theList : SlidingList String
+    , desiredListSize : Int
     }
 
 
@@ -19,7 +22,7 @@ type alias Model =
 
 
 type Msg
-    = NoOp
+    = InsertIntoList String
 
 
 
@@ -28,7 +31,14 @@ type Msg
 
 init : ( Model, Cmd Msg )
 init =
-    { message = "Hello world! 👋" } ! []
+    let
+        initListSize =
+            5
+    in
+    { theList = SlidingList.new initListSize
+    , desiredListSize = initListSize
+    }
+        ! []
 
 
 
@@ -38,8 +48,8 @@ init =
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
-        NoOp ->
-            model ! []
+        InsertIntoList item ->
+            { model | theList = model.theList |> SlidingList.insert item } ! []
 
 
 
@@ -58,7 +68,62 @@ view model =
 
 layout : Model -> ViewResult v Msg
 layout model =
-    el NoStyle [ center, verticalCenter ] (text model.message)
+    el
+        NoStyle
+        [ center, verticalCenter ]
+        (listView model)
+
+
+listView : Model -> ViewResult v Msg
+listView model =
+    column
+        NoStyle
+        [ padding 10 ]
+        [ listItemsView model.theList
+        , listInfoView model.theList
+        , addItemsView
+        ]
+
+
+listItemsView : SlidingList String -> ViewResult v Msg
+listItemsView theList =
+    column NoStyle
+        [ padding 10
+        , spacing 10
+        , center
+        ]
+        [ text "Elements currently on the list:"
+        , row
+            NoStyle
+            [ padding 10, spacing 10 ]
+            [ "[ " ++ (theList |> SlidingList.items |> String.join ", ") ++ " ]" |> text ]
+        ]
+
+
+listInfoView : SlidingList a -> ViewResult v Msg
+listInfoView theList =
+    el
+        NoStyle
+        [ padding 10 ]
+        ("Maximum items on the list: " ++ (theList |> SlidingList.maximumSize |> toString) |> text)
+
+
+addItemsView : ViewResult v Msg
+addItemsView =
+    row
+        NoStyle
+        [ spacing 10 ]
+        ([ "A", "B", "C", "D", "E" ]
+            |> List.map
+                (\i ->
+                    button
+                        NoStyle
+                        [ padding 10
+                        , onClick <| InsertIntoList i
+                        ]
+                        (text i)
+                )
+        )
 
 
 
